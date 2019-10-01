@@ -77,7 +77,17 @@ public class TCPClient {
     private boolean sendCommand(String cmd) {
         // TODO Step 2: Implement this method
         // Hint: Remember to check if connection is active
-        return false;
+        boolean commandSent = false;
+        if (this.connection.isConnected())
+        {
+            // Split the input into to parts, so that the server can recognize the command.
+            String[] cmdParts = cmd.split(" ", 2);
+            String command = cmdParts[0];
+            String message = cmdParts[1];
+            this.toServer.println(command + " " + message);
+            commandSent = true;
+        }
+        return commandSent;
     }
 
     /**
