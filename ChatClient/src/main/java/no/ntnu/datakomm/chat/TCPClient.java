@@ -100,7 +100,13 @@ public class TCPClient {
         // TODO Step 2: implement this method
         // Hint: Reuse sendCommand() method
         // Hint: update lastError if you want to store the reason for the error.
-        return false;
+        boolean messageSent = false;
+        if (message != null)
+        {
+            sendCommand("msg " + message);
+            messageSent = true;
+        }
+        return messageSent;
     }
 
     /**
