@@ -239,6 +239,8 @@ public class TCPClient {
                     String[] responseParts = serverResponse.split(" ", 2);
                     String command = responseParts[0];
                     String serverMsg = "";
+                    String sender;
+                    String messageText;
                     if (responseParts.length > 1)
                     {
                         serverMsg = responseParts[1];
@@ -263,12 +265,35 @@ public class TCPClient {
                             onUsersList(users);
                             break;
 
-                    }
 
-                    // TODO Step 7: add support for incoming chat messages from other users (types: msg, privmsg)
-                    // TODO Step 7: add support for incoming message errors (type: msgerr)
-                    // TODO Step 7: add support for incoming command errors (type: cmderr)
-                    // Hint for Step 7: call corresponding onXXX() methods which will notify all the listeners
+                        // TODO Step 7: add support for incoming chat messages from other users (types: msg, privmsg)
+                        // TODO Step 7: add support for incoming message errors (type: msgerr)
+                        // TODO Step 7: add support for incoming command errors (type: cmderr)
+                        // Hint for Step 7: call corresponding onXXX() methods which will notify all the listeners
+
+                        case "msg":
+                            String[] messageInfo = serverMsg.split(" ", 2);
+                            sender = messageInfo[0];
+                            messageText = messageInfo[1];
+                            onMsgReceived(false, sender, messageText);
+                            break;
+
+                        case "privmsg":
+                            String[] privMessageInfo = serverMsg.split(" ", 2);
+                            sender = privMessageInfo[0];
+                            messageText = privMessageInfo[1];
+                            onMsgReceived(true, sender, messageText);
+                            break;
+
+                        case "msgerr":
+                            onMsgError(serverMsg);
+                            break;
+
+                        case "cmderr":
+                            onCmdError(serverMsg);
+                            break;
+
+                    }
 
                     // TODO Step 8: add support for incoming supported command list (type: supported)
                 }
@@ -349,6 +374,11 @@ public class TCPClient {
      */
     private void onMsgReceived(boolean priv, String sender, String text) {
         // TODO Step 7: Implement this method
+        TextMessage textMessage = new TextMessage(sender, priv, text);
+        for (ChatListener l : listeners)
+        {
+            l.onMessageReceived(textMessage);
+        }
     }
 
     /**
@@ -358,6 +388,10 @@ public class TCPClient {
      */
     private void onMsgError(String errMsg) {
         // TODO Step 7: Implement this method
+        for (ChatListener l : listeners)
+        {
+            l.onMessageError(errMsg);
+        }
     }
 
     /**
@@ -367,6 +401,10 @@ public class TCPClient {
      */
     private void onCmdError(String errMsg) {
         // TODO Step 7: Implement this method
+        for (ChatListener l : listeners)
+        {
+            l.onCommandError(errMsg);
+        }
     }
 
     /**
