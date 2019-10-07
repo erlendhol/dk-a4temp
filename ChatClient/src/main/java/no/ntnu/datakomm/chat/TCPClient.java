@@ -169,6 +169,7 @@ public class TCPClient {
     public void askSupportedCommands() {
         // TODO Step 8: Implement this method
         // Hint: Reuse sendCommand() method
+        sendCommand("help");
     }
 
 
@@ -293,9 +294,14 @@ public class TCPClient {
                             onCmdError(serverMsg);
                             break;
 
-                    }
 
-                    // TODO Step 8: add support for incoming supported command list (type: supported)
+                        // TODO Step 8: add support for incoming supported command list (type: supported)
+
+                        case "supported":
+                            String[] supportedCommands = serverMsg.split(" ");
+                            onSupported(supportedCommands);
+                            break;
+                    }
                 }
         }
     }
@@ -415,5 +421,9 @@ public class TCPClient {
      */
     private void onSupported(String[] commands) {
         // TODO Step 8: Implement this method
+        for (ChatListener l : listeners)
+        {
+            l.onSupportedCommands(commands);
+        }
     }
 }
