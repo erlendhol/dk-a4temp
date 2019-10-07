@@ -95,11 +95,7 @@ public class TCPClient {
         boolean commandSent = false;
         if (this.connection.isConnected())
         {
-            // Split the input into to parts, so that the server can recognize the command.
-            String[] cmdParts = cmd.split(" ", 2);
-            String command = cmdParts[0];
-            String message = cmdParts[1];
-            this.toServer.println(command + " " + message);
+            this.toServer.println(cmd);
             commandSent = true;
         }
         return commandSent;
@@ -146,6 +142,8 @@ public class TCPClient {
         // TODO Step 5: implement this method
         // Hint: Use Wireshark and the provided chat client reference app to find out what commands the
         // client and server exchange for user listing.
+        sendCommand("users");
+
     }
 
     /**
@@ -238,10 +236,10 @@ public class TCPClient {
                 {
                     String[] responseParts = serverResponse.split(" ", 2);
                     String command = responseParts[0];
-                    String serverErrMsg = "";
+                    String serverMsg = "";
                     if (responseParts.length > 1)
                     {
-                        serverErrMsg = responseParts[1];
+                        serverMsg = responseParts[1];
                     }
 
                     switch (command)
@@ -251,13 +249,19 @@ public class TCPClient {
                             break;
 
                         case "loginerr":
-                            onLoginResult(false, serverErrMsg);
+                            onLoginResult(false, serverMsg);
                             break;
+
+
+                        // TODO Step 5: update this method, handle user-list response from the server
+                        // Hint: In Step 5 reuse onUserList() method
+
+                        case "users":
+                            String[] users = serverMsg.split(" ");
+                            onUsersList(users);
+                            break;
+
                     }
-
-
-                    // TODO Step 5: update this method, handle user-list response from the server
-                    // Hint: In Step 5 reuse onUserList() method
 
                     // TODO Step 7: add support for incoming chat messages from other users (types: msg, privmsg)
                     // TODO Step 7: add support for incoming message errors (type: msgerr)
@@ -328,6 +332,10 @@ public class TCPClient {
      */
     private void onUsersList(String[] users) {
         // TODO Step 5: Implement this method
+        for (ChatListener l : listeners)
+        {
+            l.onUserList(users);
+        }
     }
 
     /**
