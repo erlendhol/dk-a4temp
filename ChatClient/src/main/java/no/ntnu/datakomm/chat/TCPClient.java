@@ -220,15 +220,20 @@ public class TCPClient {
             String serverResponse = this.waitServerResponse();
             String[] responseParts = serverResponse.split(" ", 2);
             String command = responseParts[0];
+            String serverErrMsg = "";
+            if (responseParts.length > 1)
+            {
+                serverErrMsg = responseParts[1];
+            }
 
             switch (command)
             {
                 case "loginok":
-                    onLoginResult(true, "login successful.");
+                    onLoginResult(true, "");
                 break;
 
                 case "loginerr":
-                    onLoginResult(false, "login failed.");
+                    onLoginResult(false, serverErrMsg);
                 break;
             }
 
